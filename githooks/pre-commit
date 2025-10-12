@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Pre-commit hook for MCP Orchestrator
+# Runs linting and type checking before allowing commit
+
+echo "Running pre-commit checks..."
+
+# Change to repo root
+cd "$(git rev-parse --show-toplevel)"
+
+# Run TypeScript checks on orchestrator
+echo "  Checking orchestrator..."
+cd orchestrator
+
+if ! npm run typecheck --silent; then
+    echo "❌ TypeScript type check failed"
+    exit 1
+fi
+
+if ! npm run lint --silent; then
+    echo "❌ ESLint check failed"
+    exit 1
+fi
+
+cd ..
+
+# Check commit message format (for current commit)
+COMMIT_MSG_FILE="$1"
+if [ -f "$COMMIT_MSG_FILE" ]; then
+    COMMIT_MSG=$(cat "$COMMIT_MSG_FILE")
+    if ! echo "$COMMIT_MSG" | grep -qE '^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+'; then
+        echo "❌ Commit message must follow Conventional Commits format:"
+        echo "   <type>(<scope>): <subject>"
+        echo ""
+        echo "   Types: feat, fix, docs, style, refactor, test, chore"
+        echo "   Example: feat(orchestrator): add bidirectional sync"
+        exit 1
+    fi
+fi
+
+echo "✅ Pre-commit checks passed"

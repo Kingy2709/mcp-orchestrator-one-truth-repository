@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+      
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      
+      - name: Extract CHANGELOG entry
+        id: changelog
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d' > release-notes.md
+      
+      - name: Build orchestrator
+        run: |
+          cd orchestrator
+          npm ci
+          npm run build
+      
+      - name: Create release tarball
+        run: |
+          tar -czf mcp-orchestrator-${{ steps.version.outputs.VERSION }}.tar.gz \
+            orchestrator/dist \
+            orchestrator/package.json \
+            mcp-servers \
+            scripts \
+            docker-compose.yml \
+            .env.template \
+            README.md \
+            ARCHITECTURE.md \
+            LICENSE \
+            docs
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: release-notes.md
+          files: mcp-orchestrator-${{ steps.version.outputs.VERSION }}.tar.gz
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

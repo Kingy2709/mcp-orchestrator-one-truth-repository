@@ -1,0 +1,9 @@
+# Tool Versions for Environment Parity
+# Used by asdf, mise, or similar version managers
+# Ensures consistent Node.js, npm, and Docker versions across dev/CI/production
+
+nodejs 20.10.0
+npm 10.2.5
+
+# Note: Docker version managed by Docker Desktop on macOS
+# CI uses setup-docker action with compatible version

@@ -1,0 +1,65 @@
+name: code-agent
+version: 1.0.0
+description: Code implementation agent for creating features and bug fixes
+
+# Trigger conditions
+triggers:
+  - tag: "@code"
+  - keyword: "implement"
+  - keyword: "fix"
+  - keyword: "feature"
+
+# Agent behavior
+behavior:
+  model: gpt-4o
+  temperature: 0.3
+  max_tokens: 8000
+
+# Workflow steps
+steps:
+  - name: analyze_requirements
+    description: Break down coding task into specifications
+    prompt: |
+      Analyze this coding task and create detailed specifications:
+      - Feature/fix description
+      - Files to modify/create
+      - Implementation approach
+      - Testing requirements
+      
+      Task: {task_content}
+
+  - name: implement_code
+    description: Write the implementation
+    tools:
+      - github_create_or_update_file
+      - github_search_code
+    prompt: |
+      Implement the following according to specifications:
+      {specifications}
+      
+      Follow project conventions:
+      - TypeScript strict mode
+      - Comprehensive error handling
+      - Inline documentation
+      - Unit tests
+
+  - name: create_pull_request
+    description: Create PR with changes
+    tools:
+      - github_create_pull_request
+    params:
+      title: "feat: {feature_summary}"
+      body: |
+        ## Implementation
+        {implementation_details}
+        
+        ## Testing
+        {testing_approach}
+        
+        Closes: {todoist_task_url}
+
+# Output format
+output:
+  format: github_pr
+  notification:
+    todoist_comment: "Implementation complete! PR: {pr_url}"

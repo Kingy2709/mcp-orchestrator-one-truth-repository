@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  orchestrator:
+    build: ./orchestrator
+    container_name: mcp-orchestrator
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - OP_SERVICE_ACCOUNT_TOKEN=${OP_SERVICE_ACCOUNT_TOKEN}
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+      - ./orchestrator/src:/app/src
+    depends_on:
+      - mcp-notion
+      - mcp-todoist
+      - mcp-onepassword
+      - mcp-orchestrator-meta
+    networks:
+      - mcp-network
+
+  mcp-notion:
+    build: ./mcp-servers/notion
+    container_name: mcp-notion
+    restart: unless-stopped
+    environment:
+      - OP_SERVICE_ACCOUNT_TOKEN=${OP_SERVICE_ACCOUNT_TOKEN}
+    networks:
+      - mcp-network
+
+  mcp-todoist:
+    build: ./mcp-servers/todoist
+    container_name: mcp-todoist
+    restart: unless-stopped
+    environment:
+      - OP_SERVICE_ACCOUNT_TOKEN=${OP_SERVICE_ACCOUNT_TOKEN}
+    networks:
+      - mcp-network
+
+  mcp-onepassword:
+    build: ./mcp-servers/onepassword
+    container_name: mcp-onepassword
+    restart: unless-stopped
+    environment:
+      - OP_SERVICE_ACCOUNT_TOKEN=${OP_SERVICE_ACCOUNT_TOKEN}
+    networks:
+      - mcp-network
+
+  mcp-orchestrator-meta:
+    build: ./mcp-servers/orchestrator
+    container_name: mcp-orchestrator-meta
+    restart: unless-stopped
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
+
+volumes:
+  logs:

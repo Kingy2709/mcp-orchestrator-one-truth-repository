@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [20.x]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      
+      - name: Install orchestrator dependencies
+        run: |
+          cd orchestrator
+          npm ci
+      
+      - name: Lint orchestrator
+        run: |
+          cd orchestrator
+          npm run lint
+      
+      - name: Type check orchestrator
+        run: |
+          cd orchestrator
+          npm run typecheck
+      
+      - name: Test orchestrator
+        run: |
+          cd orchestrator
+          npm test
+      
+      - name: Build orchestrator
+        run: |
+          cd orchestrator
+          npm run build
+      
+      - name: Install MCP server dependencies
+        run: |
+          for server in mcp-servers/*; do
+            if [ -f "$server/package.json" ]; then
+              echo "Installing $server..."
+              cd "$server"
+              npm ci
+              cd ../..
+            fi
+          done
+      
+      - name: Build MCP servers
+        run: |
+          for server in mcp-servers/*; do
+            if [ -f "$server/package.json" ]; then
+              echo "Building $server..."
+              cd "$server"
+              npm run build || true
+              cd ../..
+            fi
+          done
+
+  conventional-commits:
+    name: Check Commit Messages
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Validate commit messages
+        run: |
+          git log origin/main..HEAD --format=%s | while read -r message; do
+            if ! echo "$message" | grep -qE '^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+'; then
+              echo "❌ Invalid commit message: $message"
+              echo "Must follow Conventional Commits format"
+              exit 1
+            fi
+          done

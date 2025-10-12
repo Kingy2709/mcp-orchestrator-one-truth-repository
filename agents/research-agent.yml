@@ -1,0 +1,63 @@
+name: research-agent
+version: 1.0.0
+description: Research agent for investigating topics and creating summaries in Notion
+
+# Trigger conditions
+triggers:
+  - tag: "@research"
+  - keyword: "research"
+  - keyword: "investigate"
+
+# Agent behavior
+behavior:
+  model: claude-3-5-sonnet
+  temperature: 0.7
+  max_tokens: 4000
+
+# Workflow steps
+steps:
+  - name: analyze_request
+    description: Understand what needs to be researched
+    prompt: |
+      Analyze this research request and extract:
+      - Main topic
+      - Specific questions to answer
+      - Scope of research
+      
+      Request: {task_content}
+
+  - name: search_github
+    description: Search GitHub repositories for relevant code/documentation
+    tools:
+      - github_search
+      - github_get_file
+    prompt: |
+      Search GitHub for repositories and documentation related to: {main_topic}
+      Focus on: {specific_questions}
+
+  - name: synthesize_findings
+    description: Create comprehensive summary
+    prompt: |
+      Based on the research findings, create a well-structured summary including:
+      - Overview of {main_topic}
+      - Answers to specific questions
+      - Code examples (if applicable)
+      - Best practices
+      - References and links
+
+  - name: save_to_notion
+    description: Save research summary to Notion
+    tools:
+      - notion_create_page
+    params:
+      database_id: "{NOTION_RESEARCH_DATABASE_ID}"
+      properties:
+        title: "Research: {main_topic}"
+        tags: ["research", "auto-generated"]
+
+# Output format
+output:
+  format: markdown
+  destination: notion
+  notification:
+    todoist_comment: "Research complete! View in Notion: {notion_page_url}"
