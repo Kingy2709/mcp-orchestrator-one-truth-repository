@@ -1,6 +1,7 @@
 import { config as dotenvConfig } from 'dotenv';
 import * as path from 'path';
 import { z } from 'zod';
+import { getSecret } from './secrets/onepassword';
 
 // Load .env file
 dotenvConfig({ path: path.resolve(__dirname, '../../.env') });
@@ -50,9 +51,36 @@ const ConfigSchema = z.object({
 
 export type Config = z.infer<typeof ConfigSchema>;
 
+/**
+ * Resolve a value that might be a 1Password reference (op://vault/item/field)
+ * If it starts with "op://", fetch from 1Password. Otherwise, return as-is.
+ */
+async function resolveSecret(value: string | undefined): Promise<string | undefined> {
+  if (!value) return value;
+  if (value.startsWith('op://')) {
+    return await getSecret(value);
+  }
+  return value;
+}
+
 // Parse and validate environment variables
-function loadConfig(): Config {
+async function loadConfig(): Promise<Config> {
   try {
+    // Resolve all secrets that might be 1Password references
+    const [
+      notionApiKey,
+      todoistApiToken,
+      todoistWebhookSecret,
+      githubPat,
+      githubWebhookSecret,
+    ] = await Promise.all([
+      resolveSecret(process.env.NOTION_API_KEY),
+      resolveSecret(process.env.TODOIST_API_TOKEN),
+      resolveSecret(process.env.TODOIST_WEBHOOK_SECRET),
+      resolveSecret(process.env.GITHUB_PAT),
+      resolveSecret(process.env.GITHUB_WEBHOOK_SECRET),
+    ]);
+
     return ConfigSchema.parse({
       nodeEnv: process.env.NODE_ENV,
       logLevel: process.env.LOG_LEVEL,
@@ -60,16 +88,17 @@ function loadConfig(): Config {
 
       opServiceAccountToken: process.env.OP_SERVICE_ACCOUNT_TOKEN,
 
-      notionApiKey: process.env.NOTION_API_KEY,
+      // These are resolved from 1Password if they start with "op://"
+      notionApiKey,
       notionTasksDatabaseId: process.env.NOTION_TASKS_DATABASE_ID,
       notionResearchDatabaseId: process.env.NOTION_RESEARCH_DATABASE_ID,
       notionCompletionsDatabaseId: process.env.NOTION_COMPLETIONS_DATABASE_ID,
 
-      todoistApiToken: process.env.TODOIST_API_TOKEN,
-      todoistWebhookSecret: process.env.TODOIST_WEBHOOK_SECRET,
+      todoistApiToken,
+      todoistWebhookSecret,
 
-      githubPat: process.env.GITHUB_PAT,
-      githubWebhookSecret: process.env.GITHUB_WEBHOOK_SECRET,
+      githubPat,
+      githubWebhookSecret,
 
       syncIntervalNotion: process.env.SYNC_INTERVAL_NOTION,
       syncIntervalTodoist: process.env.SYNC_INTERVAL_TODOIST,
@@ -95,4 +124,6 @@ function loadConfig(): Config {
   }
 }
 
+// Export a promise that resolves to the config
+// Usage: `import { config } from './config'; const cfg = await config;`
 export const config = loadConfig();

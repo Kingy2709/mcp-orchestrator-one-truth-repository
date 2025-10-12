@@ -1,10 +1,11 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
+import { Config } from '../config';
 import { WebhookError } from '../utils/errors';
 import { logger } from '../utils/logger';
 import { handleGitHubWebhook } from './github';
 import { handleTodoistWebhook } from './todoist';
 
-export function webhookServer(): Express {
+export function webhookServer(config: Config): Express {
   const app = express();
 
   // Middleware
@@ -38,7 +39,7 @@ export function webhookServer(): Express {
   // Todoist webhook
   app.post('/webhooks/todoist', async (req: Request, res: Response) => {
     try {
-      await handleTodoistWebhook(req, res);
+      await handleTodoistWebhook(config, req, res);
     } catch (error) {
       logger.error('Todoist webhook handler error', { error });
       res.status(500).json({ error: 'Internal server error' });
@@ -48,7 +49,7 @@ export function webhookServer(): Express {
   // GitHub webhook
   app.post('/webhooks/github', async (req: Request, res: Response) => {
     try {
-      await handleGitHubWebhook(req, res);
+      await handleGitHubWebhook(config, req, res);
     } catch (error) {
       logger.error('GitHub webhook handler error', { error });
       res.status(500).json({ error: 'Internal server error' });

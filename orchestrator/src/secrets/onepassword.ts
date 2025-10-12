@@ -1,5 +1,4 @@
 import { createClient, type Client } from '@1password/sdk';
-import { config } from '../config';
 import { ConfigurationError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
@@ -7,9 +6,15 @@ let opClient: Client | null = null;
 
 export async function getOnePasswordClient(): Promise<Client> {
   if (!opClient) {
+    // Get Service Account token directly from env (this is the bootstrap secret)
+    const token = process.env.OP_SERVICE_ACCOUNT_TOKEN;
+    if (!token) {
+      throw new ConfigurationError('OP_SERVICE_ACCOUNT_TOKEN environment variable not set');
+    }
+
     try {
       opClient = await createClient({
-        auth: config.opServiceAccountToken,
+        auth: token,
         integrationName: 'MCP Orchestrator',
         integrationVersion: '0.1.0',
       });

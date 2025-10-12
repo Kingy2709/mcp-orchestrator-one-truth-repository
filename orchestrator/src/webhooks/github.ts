@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { Request, Response } from 'express';
-import { config } from '../config';
+import type { Config } from '../config';
 import { WebhookError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
@@ -14,7 +14,7 @@ interface GitHubWebhookEvent {
   };
 }
 
-function verifyGitHubSignature(req: Request): boolean {
+function verifyGitHubSignature(config: Config, req: Request): boolean {
   if (!config.githubWebhookSecret) {
     logger.warn('GitHub webhook secret not configured, skipping verification');
     return true;
@@ -34,9 +34,9 @@ function verifyGitHubSignature(req: Request): boolean {
   return signature === expectedSignature;
 }
 
-export async function handleGitHubWebhook(req: Request, res: Response) {
+export async function handleGitHubWebhook(config: Config, req: Request, res: Response) {
   // Verify signature
-  if (!verifyGitHubSignature(req)) {
+  if (!verifyGitHubSignature(config, req)) {
     throw new WebhookError('Invalid webhook signature', 401);
   }
 

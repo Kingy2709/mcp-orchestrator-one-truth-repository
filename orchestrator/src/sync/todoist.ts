@@ -1,23 +1,19 @@
 import { TodoistApi } from '@doist/todoist-api-typescript';
-import { config } from '../config';
+import type { Config } from '../config';
 import { TodoistError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
-let todoistClient: TodoistApi | null = null;
-let syncInterval: NodeJS.Timeout | null = null;
 
-export function getTodoistClient(): TodoistApi {
-  if (!todoistClient) {
-    todoistClient = new TodoistApi(config.todoistApiToken);
-  }
-  return todoistClient;
+
+export function getTodoistClient(config: Config): TodoistApi {
+  return new TodoistApi(config.todoistApiToken);
 }
 
-export async function syncTodoistTasks() {
+export async function syncTodoistTasks(config: Config) {
   try {
     logger.info('Starting Todoist sync...');
 
-    const todoist = getTodoistClient();
+  const todoist = getTodoistClient(config);
     const tasks = await todoist.getTasks();
 
     logger.info(`Retrieved ${tasks.length} tasks from Todoist`);
@@ -31,26 +27,25 @@ export async function syncTodoistTasks() {
   }
 }
 
-export function startTodoistSync(intervalMs: number) {
+export function startTodoistSync(config: Config, intervalMs: number) {
+  let syncInterval: NodeJS.Timeout | null = null; // Declare syncInterval here
   if (syncInterval) {
     clearInterval(syncInterval);
   }
-
   syncInterval = setInterval(async () => {
     try {
-      await syncTodoistTasks();
+      await syncTodoistTasks(config);
     } catch (error) {
       logger.error('Sync interval error', { error });
     }
   }, intervalMs);
-
   // Run initial sync
-  syncTodoistTasks().catch((error) => {
+  syncTodoistTasks(config).catch((error) => {
     logger.error('Initial Todoist sync failed', { error });
   });
 }
 
-export function stopTodoistSync() {
+export function stopTodoistSync(syncInterval: NodeJS.Timeout | null) {
   if (syncInterval) {
     clearInterval(syncInterval);
     syncInterval = null;

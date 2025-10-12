@@ -1,4 +1,4 @@
-import { config } from '../config';
+import type { Config } from '../config';
 import { logger } from '../utils/logger';
 
 interface Task {
@@ -12,7 +12,7 @@ interface TaggingResult {
   confidence: number;
 }
 
-export async function autoTagTask(task: Task): Promise<TaggingResult> {
+export async function autoTagTask(config: Config, task: Task): Promise<TaggingResult> {
   if (!config.aiTaggingEnabled) {
     logger.debug('AI tagging disabled, skipping', { taskId: task.id });
     return { suggestedTags: [], confidence: 0 };

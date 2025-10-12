@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { Request, Response } from 'express';
 import { autoTagTask } from '../agents/auto-tagger';
 import { delegateTask } from '../agents/task-delegator';
-import { config } from '../config';
+import type { Config } from '../config';
 import { WebhookError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
@@ -19,7 +19,7 @@ interface TodoistWebhookEvent {
   };
 }
 
-function verifyTodoistSignature(req: Request): boolean {
+function verifyTodoistSignature(config: Config, req: Request): boolean {
   if (!config.todoistWebhookSecret) {
     logger.warn('Todoist webhook secret not configured, skipping verification');
     return true;
@@ -39,9 +39,9 @@ function verifyTodoistSignature(req: Request): boolean {
   return signature === expectedSignature;
 }
 
-export async function handleTodoistWebhook(req: Request, res: Response) {
+export async function handleTodoistWebhook(config: Config, req: Request, res: Response) {
   // Verify signature
-  if (!verifyTodoistSignature(req)) {
+  if (!verifyTodoistSignature(config, req)) {
     throw new WebhookError('Invalid webhook signature', 401);
   }
 
@@ -54,7 +54,7 @@ export async function handleTodoistWebhook(req: Request, res: Response) {
   try {
     switch (event.event_name) {
       case 'item:added':
-        await handleTaskAdded(event.event_data);
+        await handleTaskAdded(config, event.event_data);
         break;
 
       case 'item:completed':
@@ -76,13 +76,13 @@ export async function handleTodoistWebhook(req: Request, res: Response) {
   }
 }
 
-async function handleTaskAdded(taskData: TodoistWebhookEvent['event_data']) {
+async function handleTaskAdded(config: Config, taskData: TodoistWebhookEvent['event_data']) {
   logger.info('Processing new task', { taskId: taskData.id, content: taskData.content });
 
   try {
     // Auto-tag the task
     if (config.aiTaggingEnabled) {
-      await autoTagTask({
+      await autoTagTask(config, {
         id: taskData.id,
         content: taskData.content,
         labels: taskData.labels || [],
@@ -91,7 +91,7 @@ async function handleTaskAdded(taskData: TodoistWebhookEvent['event_data']) {
 
     // Check for agent delegation triggers
     if (config.agentDelegationEnabled) {
-      await delegateTask({
+      await delegateTask(config, {
         id: taskData.id,
         content: taskData.content,
         labels: taskData.labels || [],

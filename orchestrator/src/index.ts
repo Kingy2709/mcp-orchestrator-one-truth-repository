@@ -1,32 +1,38 @@
 import { config } from './config';
 import { startNotionSync } from './sync/notion';
 import { startTodoistSync } from './sync/todoist';
-import { logger } from './utils/logger';
+import { initializeLogger, logger } from './utils/logger';
 import { webhookServer } from './webhooks/server';
 
 async function main() {
   try {
+    // Load config (with 1Password resolution if needed)
+    const cfg = await config;
+
+    // Initialize logger with resolved config
+    initializeLogger(cfg);
+
     logger.info('Starting MCP Orchestrator...', {
       version: process.env.npm_package_version,
       nodeVersion: process.version,
-      env: config.nodeEnv,
+      env: cfg.nodeEnv,
     });
 
     // Start webhook server
-    const app = webhookServer();
-    const server = app.listen(config.port, () => {
-      logger.info(`Webhook server listening on port ${config.port}`);
+    const app = webhookServer(cfg);
+    const server = app.listen(cfg.port, () => {
+      logger.info(`Webhook server listening on port ${cfg.port}`);
     });
 
     // Start sync engines
-    if (config.syncIntervalNotion > 0) {
-      startNotionSync(config.syncIntervalNotion);
-      logger.info(`Notion sync started (interval: ${config.syncIntervalNotion}ms)`);
+    if (cfg.syncIntervalNotion > 0) {
+      startNotionSync(cfg, cfg.syncIntervalNotion);
+      logger.info(`Notion sync started (interval: ${cfg.syncIntervalNotion}ms)`);
     }
 
-    if (config.syncIntervalTodoist > 0) {
-      startTodoistSync(config.syncIntervalTodoist);
-      logger.info(`Todoist sync started (interval: ${config.syncIntervalTodoist}ms)`);
+    if (cfg.syncIntervalTodoist > 0) {
+      startTodoistSync(cfg, cfg.syncIntervalTodoist);
+      logger.info(`Todoist sync started (interval: ${cfg.syncIntervalTodoist}ms)`);
     }
 
     // Graceful shutdown

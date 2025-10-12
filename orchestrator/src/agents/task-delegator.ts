@@ -1,4 +1,4 @@
-import { config } from '../config';
+import type { Config } from '../config';
 import { logger } from '../utils/logger';
 
 interface Task {
@@ -7,7 +7,7 @@ interface Task {
   labels: string[];
 }
 
-export async function delegateTask(task: Task) {
+export async function delegateTask(config: Config, task: Task) {
   if (!config.agentDelegationEnabled) {
     logger.debug('Agent delegation disabled, skipping', { taskId: task.id });
     return;

@@ -1,25 +1,21 @@
 import { Client } from '@notionhq/client';
-import { config } from '../config';
+import type { Config } from '../config';
 import { NotionError } from '../utils/errors';
 import { logger } from '../utils/logger';
 
-let notionClient: Client | null = null;
-let syncInterval: NodeJS.Timeout | null = null;
 
-export function getNotionClient(): Client {
-  if (!notionClient) {
-    notionClient = new Client({
-      auth: config.notionApiKey,
-    });
-  }
-  return notionClient;
+
+export function getNotionClient(config: Config): Client {
+  return new Client({
+    auth: config.notionApiKey,
+  });
 }
 
-export async function syncNotionToTodoist() {
+export async function syncNotionToTodoist(config: Config) {
   try {
     logger.info('Starting Notion → Todoist sync...');
 
-    const notion = getNotionClient();
+  const notion = getNotionClient(config);
 
     // Query tasks database
     if (!config.notionTasksDatabaseId) {
@@ -52,11 +48,11 @@ export async function syncNotionToTodoist() {
   }
 }
 
-export async function syncTodoistToNotion() {
+export async function syncTodoistToNotion(config: Config) {
   try {
     logger.info('Starting Todoist → Notion sync...');
 
-    // TODO: Implement Todoist → Notion sync logic
+  // TODO: Implement Todoist → Notion sync logic
 
     logger.info('Todoist → Notion sync completed successfully');
   } catch (error) {
@@ -65,27 +61,28 @@ export async function syncTodoistToNotion() {
   }
 }
 
-export function startNotionSync(intervalMs: number) {
+export function startNotionSync(config: Config, intervalMs: number) {
+  let syncInterval: NodeJS.Timeout | null = null;
   if (syncInterval) {
     clearInterval(syncInterval);
   }
 
   syncInterval = setInterval(async () => {
     try {
-      await syncNotionToTodoist();
-      await syncTodoistToNotion();
+      await syncNotionToTodoist(config);
+      await syncTodoistToNotion(config);
     } catch (error) {
       logger.error('Sync interval error', { error });
     }
   }, intervalMs);
 
   // Run initial sync
-  syncNotionToTodoist().catch((error) => {
+  syncNotionToTodoist(config).catch((error) => {
     logger.error('Initial Notion sync failed', { error });
   });
 }
 
-export function stopNotionSync() {
+export function stopNotionSync(syncInterval: NodeJS.Timeout | null) {
   if (syncInterval) {
     clearInterval(syncInterval);
     syncInterval = null;

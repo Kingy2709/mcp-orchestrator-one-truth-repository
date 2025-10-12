@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { config } from '../config';
+import type { Config } from '../config';
 
 const logFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -17,18 +17,17 @@ const consoleFormat = winston.format.combine(
   })
 );
 
-export const logger = winston.createLogger({
-  level: config.logLevel,
+// Default logger with 'info' level until config is loaded
+export let logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
   format: logFormat,
   defaultMeta: { service: 'mcp-orchestrator' },
   transports: [
-    // Write all logs to combined.log
     new winston.transports.File({
       filename: 'logs/combined.log',
-      maxsize: 10485760, // 10MB
-      maxFiles: 7, // Keep 7 days
+      maxsize: 10485760,
+      maxFiles: 7,
     }),
-    // Write errors to error.log
     new winston.transports.File({
       filename: 'logs/error.log',
       level: 'error',
@@ -39,12 +38,28 @@ export const logger = winston.createLogger({
 });
 
 // Console logging in development
-if (config.nodeEnv !== 'production') {
+if (process.env.NODE_ENV !== 'production') {
   logger.add(
     new winston.transports.Console({
       format: consoleFormat,
     })
   );
+}
+
+/**
+ * Initialize logger with resolved config (call once after config loads)
+ */
+export function initializeLogger(config: Config) {
+  logger.level = config.logLevel;
+
+  // Update console transport based on environment
+  if (config.nodeEnv !== 'production' && !logger.transports.find(t => t instanceof winston.transports.Console)) {
+    logger.add(
+      new winston.transports.Console({
+        format: consoleFormat,
+      })
+    );
+  }
 }
 
 export default logger;
