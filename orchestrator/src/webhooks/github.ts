@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
 import crypto from 'crypto';
+import { Request, Response } from 'express';
 import { config } from '../config';
-import { logger } from '../utils/logger';
 import { WebhookError } from '../utils/errors';
+import { logger } from '../utils/logger';
 
 interface GitHubWebhookEvent {
   action: string;
@@ -54,15 +54,15 @@ export async function handleGitHubWebhook(req: Request, res: Response) {
       case 'push':
         await handlePush(payload);
         break;
-      
+
       case 'pull_request':
         await handlePullRequest(payload);
         break;
-      
+
       case 'issues':
         await handleIssue(payload);
         break;
-      
+
       default:
         logger.debug('Unhandled GitHub event', { event });
     }
@@ -76,7 +76,7 @@ export async function handleGitHubWebhook(req: Request, res: Response) {
 
 async function handlePush(payload: GitHubWebhookEvent) {
   logger.info('Processing push event', { repository: payload.repository.full_name });
-  
+
   // TODO: Implement push event handling
   // Could trigger Notion updates, Copilot Agent tasks, etc.
 }
@@ -86,7 +86,7 @@ async function handlePullRequest(payload: GitHubWebhookEvent) {
     repository: payload.repository.full_name,
     action: payload.action,
   });
-  
+
   // TODO: Implement PR event handling
 }
 
@@ -95,6 +95,6 @@ async function handleIssue(payload: GitHubWebhookEvent) {
     repository: payload.repository.full_name,
     action: payload.action,
   });
-  
+
   // TODO: Implement issue event handling
 }

@@ -1,5 +1,5 @@
-import { logger } from '../utils/logger';
 import { config } from '../config';
+import { logger } from '../utils/logger';
 
 interface Task {
   id: string;
@@ -40,7 +40,7 @@ async function triggerAgent(agentType: string, task: Task) {
 
   // TODO: Implement actual Copilot Agent triggering via GitHub API
   // For now, just log the intention
-  
+
   switch (agentType) {
     case 'research':
       logger.info('Would trigger research agent', {
@@ -51,7 +51,7 @@ async function triggerAgent(agentType: string, task: Task) {
         },
       });
       break;
-    
+
     case 'code':
       logger.info('Would trigger code agent', {
         prompt: `Implement: ${task.content}`,
@@ -61,7 +61,7 @@ async function triggerAgent(agentType: string, task: Task) {
         },
       });
       break;
-    
+
     case 'summary':
       logger.info('Would trigger summary agent', {
         prompt: `Summarize: ${task.content}`,
@@ -70,7 +70,7 @@ async function triggerAgent(agentType: string, task: Task) {
         },
       });
       break;
-    
+
     default:
       logger.warn('Unknown agent type', { agentType });
   }

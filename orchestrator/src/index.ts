@@ -1,9 +1,8 @@
-import express from 'express';
 import { config } from './config';
-import { logger } from './utils/logger';
-import { webhookServer } from './webhooks/server';
 import { startNotionSync } from './sync/notion';
 import { startTodoistSync } from './sync/todoist';
+import { logger } from './utils/logger';
+import { webhookServer } from './webhooks/server';
 
 async function main() {
   try {
@@ -33,7 +32,7 @@ async function main() {
     // Graceful shutdown
     const shutdown = async (signal: string) => {
       logger.info(`Received ${signal}, shutting down gracefully...`);
-      
+
       server.close(() => {
         logger.info('HTTP server closed');
         process.exit(0);

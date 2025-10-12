@@ -1,5 +1,5 @@
-import { logger } from '../utils/logger';
 import { SyncConflictError } from '../utils/errors';
+import { logger } from '../utils/logger';
 
 export interface SyncConflict {
   id: string;
@@ -52,13 +52,13 @@ export function resolveConflict(
 export async function bidirectionalSync() {
   try {
     logger.info('Starting bidirectional sync...');
-    
+
     // TODO: Implement full bidirectional sync logic
     // 1. Fetch changes from both Notion and Todoist
     // 2. Detect conflicts
     // 3. Resolve conflicts using strategy
     // 4. Apply changes to both systems
-    
+
     logger.info('Bidirectional sync completed successfully');
   } catch (error) {
     logger.error('Bidirectional sync failed', { error });

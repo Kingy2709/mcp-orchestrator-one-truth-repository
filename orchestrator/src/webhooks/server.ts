@@ -1,9 +1,8 @@
-import express, { Express, Request, Response, NextFunction } from 'express';
-import { config } from '../config';
-import { logger } from '../utils/logger';
+import express, { Express, NextFunction, Request, Response } from 'express';
 import { WebhookError } from '../utils/errors';
-import { handleTodoistWebhook } from './todoist';
+import { logger } from '../utils/logger';
 import { handleGitHubWebhook } from './github';
+import { handleTodoistWebhook } from './todoist';
 
 export function webhookServer(): Express {
   const app = express();
@@ -64,7 +63,7 @@ export function webhookServer(): Express {
   // Error handler
   app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     logger.error('Unhandled error', { error: err, path: req.path });
-    
+
     if (err instanceof WebhookError) {
       res.status(err.statusCode).json({ error: err.message });
     } else {

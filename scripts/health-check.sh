@@ -30,7 +30,7 @@ if command -v docker &> /dev/null; then
     echo ""
     echo "Checking Docker containers..."
     cd "$PROJECT_ROOT"
-    
+
     if docker-compose ps | grep -q "Up"; then
         echo "✅ Docker containers running:"
         docker-compose ps
@@ -45,7 +45,7 @@ echo ""
 echo "Checking configuration..."
 if [ -f "$PROJECT_ROOT/.env" ]; then
     echo "✅ .env file exists"
-    
+
     # Check for required variables
     REQUIRED_VARS=("NOTION_API_KEY" "TODOIST_API_TOKEN" "OP_SERVICE_ACCOUNT_TOKEN")
     for var in "${REQUIRED_VARS[@]}"; do

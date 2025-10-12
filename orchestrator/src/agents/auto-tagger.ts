@@ -1,5 +1,5 @@
-import { logger } from '../utils/logger';
 import { config } from '../config';
+import { logger } from '../utils/logger';
 
 interface Task {
   id: string;
@@ -22,7 +22,7 @@ export async function autoTagTask(task: Task): Promise<TaggingResult> {
 
   try {
     const result = await analyzeTaskContent(task.content);
-    
+
     logger.info('Auto-tagging complete', {
       taskId: task.id,
       suggestedTags: result.suggestedTags,
@@ -30,7 +30,7 @@ export async function autoTagTask(task: Task): Promise<TaggingResult> {
     });
 
     // TODO: Apply tags to Todoist task via API
-    
+
     return result;
   } catch (error) {
     logger.error('Failed to auto-tag task', { error, taskId: task.id });
@@ -79,6 +79,6 @@ async function analyzeWithEmbeddings(content: string): Promise<TaggingResult> {
   // TODO: Use OpenAI embeddings or Claude API for semantic analysis
   // const embedding = await openai.embeddings.create({ input: content, model: "text-embedding-3-small" });
   // Compare with known tag embeddings to find best matches
-  
+
   return { suggestedTags: [], confidence: 0 };
 }

@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
 import crypto from 'crypto';
-import { config } from '../config';
-import { logger } from '../utils/logger';
-import { WebhookError } from '../utils/errors';
-import { delegateTask } from '../agents/task-delegator';
+import { Request, Response } from 'express';
 import { autoTagTask } from '../agents/auto-tagger';
+import { delegateTask } from '../agents/task-delegator';
+import { config } from '../config';
+import { WebhookError } from '../utils/errors';
+import { logger } from '../utils/logger';
 
 interface TodoistWebhookEvent {
   event_name: string;
@@ -56,15 +56,15 @@ export async function handleTodoistWebhook(req: Request, res: Response) {
       case 'item:added':
         await handleTaskAdded(event.event_data);
         break;
-      
+
       case 'item:completed':
         await handleTaskCompleted(event.event_data);
         break;
-      
+
       case 'item:updated':
         await handleTaskUpdated(event.event_data);
         break;
-      
+
       default:
         logger.debug('Unhandled Todoist event', { eventName: event.event_name });
     }

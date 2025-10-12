@@ -1,6 +1,6 @@
 import { config as dotenvConfig } from 'dotenv';
-import { z } from 'zod';
 import * as path from 'path';
+import { z } from 'zod';
 
 // Load .env file
 dotenvConfig({ path: path.resolve(__dirname, '../../.env') });
@@ -57,29 +57,29 @@ function loadConfig(): Config {
       nodeEnv: process.env.NODE_ENV,
       logLevel: process.env.LOG_LEVEL,
       port: process.env.PORT,
-      
+
       opServiceAccountToken: process.env.OP_SERVICE_ACCOUNT_TOKEN,
-      
+
       notionApiKey: process.env.NOTION_API_KEY,
       notionTasksDatabaseId: process.env.NOTION_TASKS_DATABASE_ID,
       notionResearchDatabaseId: process.env.NOTION_RESEARCH_DATABASE_ID,
       notionCompletionsDatabaseId: process.env.NOTION_COMPLETIONS_DATABASE_ID,
-      
+
       todoistApiToken: process.env.TODOIST_API_TOKEN,
       todoistWebhookSecret: process.env.TODOIST_WEBHOOK_SECRET,
-      
+
       githubPat: process.env.GITHUB_PAT,
       githubWebhookSecret: process.env.GITHUB_WEBHOOK_SECRET,
-      
+
       syncIntervalNotion: process.env.SYNC_INTERVAL_NOTION,
       syncIntervalTodoist: process.env.SYNC_INTERVAL_TODOIST,
-      
+
       aiTaggingEnabled: process.env.AI_TAGGING_ENABLED,
       aiModel: process.env.AI_MODEL,
-      
+
       agentDelegationEnabled: process.env.AGENT_DELEGATION_ENABLED,
       agentTriggerTags: process.env.AGENT_TRIGGER_TAGS,
-      
+
       tailscaleIp: process.env.TAILSCALE_IP,
       sentryDsn: process.env.SENTRY_DSN,
     });

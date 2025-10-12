@@ -111,8 +111,8 @@ export const notionTools: MCPTool[] = [
     },
     handler: async (notion, args) => {
       const databaseId = args.database_id as string;
-      const filter = args.filter as Record<string, unknown> | undefined;
-      const sorts = args.sorts as Array<unknown> | undefined;
+      const filter = args.filter as any;
+      const sorts = args.sorts as any;
 
       const response = await notion.databases.query({
         database_id: databaseId,
@@ -142,7 +142,7 @@ export const notionTools: MCPTool[] = [
     },
     handler: async (notion, args) => {
       const pageId = args.page_id as string;
-      const properties = args.properties as Record<string, unknown>;
+      const properties = args.properties as any;
 
       const response = await notion.pages.update({
         page_id: pageId,

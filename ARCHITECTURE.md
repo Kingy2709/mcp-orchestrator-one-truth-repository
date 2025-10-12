@@ -173,12 +173,12 @@ const app = express();
 
 app.post('/webhooks/todoist', async (req, res) => {
   const event = req.body; // Todoist event payload
-  
+
   // Verify webhook signature
   if (!verifyTodoistSignature(req)) {
     return res.status(401).send('Invalid signature');
   }
-  
+
   // Process event
   switch (event.event_name) {
     case 'item:added':
@@ -188,7 +188,7 @@ app.post('/webhooks/todoist', async (req, res) => {
       await handleTaskCompleted(event.event_data);
       break;
   }
-  
+
   res.status(200).send('OK');
 });
 ```
@@ -208,7 +208,7 @@ app.post('/webhooks/todoist', async (req, res) => {
 // agents/task-delegator.ts
 export async function delegateTask(task: Task) {
   const tags = task.labels;
-  
+
   if (tags.includes('research')) {
     await triggerCopilotAgent({
       agent: 'research-agent',
@@ -219,7 +219,7 @@ export async function delegateTask(task: Task) {
       },
     });
   }
-  
+
   if (tags.includes('code')) {
     await triggerCopilotAgent({
       agent: 'code-agent',

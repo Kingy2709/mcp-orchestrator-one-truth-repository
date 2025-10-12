@@ -38,13 +38,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 // Handle tool calls
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const tool = notionTools.find(t => t.name === request.params.name);
-  
+
   if (!tool) {
     throw new Error(`Unknown tool: ${request.params.name}`);
   }
 
   try {
-    const result = await tool.handler(notion, request.params.arguments);
+    const result = await tool.handler(notion, request.params.arguments || {});
     return {
       content: [
         {

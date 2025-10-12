@@ -1,7 +1,7 @@
 import { Client } from '@notionhq/client';
 import { config } from '../config';
-import { logger } from '../utils/logger';
 import { NotionError } from '../utils/errors';
+import { logger } from '../utils/logger';
 
 let notionClient: Client | null = null;
 let syncInterval: NodeJS.Timeout | null = null;
@@ -18,9 +18,9 @@ export function getNotionClient(): Client {
 export async function syncNotionToTodoist() {
   try {
     logger.info('Starting Notion → Todoist sync...');
-    
+
     const notion = getNotionClient();
-    
+
     // Query tasks database
     if (!config.notionTasksDatabaseId) {
       logger.warn('Notion tasks database ID not configured, skipping sync');
@@ -38,7 +38,7 @@ export async function syncNotionToTodoist() {
     });
 
     logger.info(`Found ${response.results.length} unsynced tasks in Notion`);
-    
+
     // TODO: Implement actual sync logic with Todoist
     // For now, just log the tasks
     response.results.forEach((page) => {
@@ -55,9 +55,9 @@ export async function syncNotionToTodoist() {
 export async function syncTodoistToNotion() {
   try {
     logger.info('Starting Todoist → Notion sync...');
-    
+
     // TODO: Implement Todoist → Notion sync logic
-    
+
     logger.info('Todoist → Notion sync completed successfully');
   } catch (error) {
     logger.error('Failed to sync Todoist → Notion', { error });

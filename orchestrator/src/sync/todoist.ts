@@ -1,7 +1,7 @@
 import { TodoistApi } from '@doist/todoist-api-typescript';
 import { config } from '../config';
-import { logger } from '../utils/logger';
 import { TodoistError } from '../utils/errors';
+import { logger } from '../utils/logger';
 
 let todoistClient: TodoistApi | null = null;
 let syncInterval: NodeJS.Timeout | null = null;
@@ -16,14 +16,14 @@ export function getTodoistClient(): TodoistApi {
 export async function syncTodoistTasks() {
   try {
     logger.info('Starting Todoist sync...');
-    
+
     const todoist = getTodoistClient();
     const tasks = await todoist.getTasks();
 
     logger.info(`Retrieved ${tasks.length} tasks from Todoist`);
-    
+
     // TODO: Implement sync logic with Notion and Google Calendar
-    
+
     logger.info('Todoist sync completed successfully');
   } catch (error) {
     logger.error('Failed to sync Todoist tasks', { error });

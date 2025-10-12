@@ -23,7 +23,7 @@ steps:
       - Main topic
       - Specific questions to answer
       - Scope of research
-      
+
       Request: {task_content}
 
   - name: search_github

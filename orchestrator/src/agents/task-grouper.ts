@@ -18,14 +18,14 @@ export async function groupSimilarTasks(newTask: Task, existingTasks: Task[]): P
 
   try {
     const similarTasks = await findSimilarTasks(newTask, existingTasks);
-    
+
     if (similarTasks.length === 0) {
       logger.debug('No similar tasks found', { taskId: newTask.id });
       return null;
     }
 
     const groupName = await suggestGroupName(newTask, similarTasks);
-    
+
     const group: TaskGroup = {
       groupId: `group-${Date.now()}`,
       groupName,
@@ -50,7 +50,7 @@ export async function groupSimilarTasks(newTask: Task, existingTasks: Task[]): P
 async function findSimilarTasks(targetTask: Task, candidates: Task[]): Promise<Task[]> {
   // TODO: Implement embeddings-based similarity search
   // For now, use simple keyword matching
-  
+
   const targetWords = new Set(
     targetTask.content.toLowerCase().split(/\W+/).filter(w => w.length > 3)
   );
@@ -87,7 +87,7 @@ async function suggestGroupName(task: Task, similarTasks: Task[]): Promise<strin
 
   const allContent = [task, ...similarTasks].map(t => t.content).join(' ');
   const words = allContent.toLowerCase().split(/\W+/);
-  
+
   const wordFreq = words.reduce((acc, word) => {
     if (word.length > 3) {
       acc[word] = (acc[word] || 0) + 1;

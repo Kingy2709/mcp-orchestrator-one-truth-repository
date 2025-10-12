@@ -1,11 +1,11 @@
-import { createClient } from '@1password/sdk';
+import { createClient, type Client } from '@1password/sdk';
 import { config } from '../config';
-import { logger } from '../utils/logger';
 import { ConfigurationError } from '../utils/errors';
+import { logger } from '../utils/logger';
 
-let opClient: ReturnType<typeof createClient> | null = null;
+let opClient: Client | null = null;
 
-export async function getOnePasswordClient() {
+export async function getOnePasswordClient(): Promise<Client> {
   if (!opClient) {
     try {
       opClient = await createClient({
@@ -26,7 +26,7 @@ export async function getSecret(reference: string): Promise<string> {
   try {
     const client = await getOnePasswordClient();
     const secret = await client.secrets.resolve(reference);
-    
+
     logger.debug('Secret retrieved', { reference: reference.replace(/[^:\/]/g, '*') });
     return secret;
   } catch (error) {
