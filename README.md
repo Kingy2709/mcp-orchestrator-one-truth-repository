@@ -1,89 +1,134 @@
 # MCP Orchestrator - One Truth Repository
 
-**Single source of truth across all AI-injected tools**
+**ADHD-optimized task management with n8n-powered bidirectional sync**
 
-Transform your ADHD-optimized workflow into a seamless orchestration layer connecting Notion, Todoist, GitHub Copilot, and 1Password via the Model Context Protocol (MCP).
+Transform your workflow into a seamless automation connecting Notion, Todoist, and AI—maintaining a single source of truth without context-switching.
+
+## 🚨 Current Status (October 2025)
+
+**Strategic Pivot:** This project initially aimed to build a custom TypeScript orchestrator but **pivoted to n8n Starter (€20/mo)** after discovering:
+
+1. ✅ **Official MCP servers exist** (`makenotion/notion-mcp-server`, community Todoist MCP)
+2. ✅ **n8n template** provides bidirectional sync in 3-5 hours vs 40+ hours custom development
+3. ✅ **All AI features included** (multi-agent, LangChain, local LLM) at €20/mo vs Motion $49/mo
+
+**Decision rationale:** See [STRATEGIC-VALUE-ANALYSIS.md](docs/STRATEGIC-VALUE-ANALYSIS.md) for comprehensive comparison (n8n vs Zapier vs Motion).
+
+**Architecture Decision Records:**
+- [ADR-001: Use n8n Over Custom Orchestrator](docs/decisions/ADR-001-use-n8n-over-custom.md)
+- [ADR-002: Reject Motion](docs/decisions/ADR-002-reject-motion.md)
+
+---
 
 ## Overview
 
-This orchestrator runs as a background service on your Mac, automatically syncing tasks, knowledge, and context across your AI tools. Capture thoughts via Siri, auto-tag with AI, delegate to Copilot Agents, and maintain a canonical source of truth in Notion—all without context-switching.
+This repository documents an **ADHD-optimized workflow** using n8n for automated bidirectional sync between Notion and Todoist. Capture thoughts via Siri, auto-tag with AI, sync to Notion, and maintain a canonical source of truth—all in < 5 seconds.
 
 ### Key Features
 
-- ⚡ **Quick Capture**: Siri → Todoist → Auto-tagged → Notion (< 5 seconds)
-- 🤖 **Agent Delegation**: @research/@code tags trigger Copilot Agents automatically
-- 🔄 **Bidirectional Sync**: Notion ↔ Todoist ↔ Google Calendar (conflict-free)
-- 🏷️ **AI Auto-Tagging**: Smart categorization (@work/@personal/@urgent)
-- 📦 **Task Grouping**: AI detects similar tasks, suggests projects
-- 🔐 **1Password Integration**: Service Account for secure secret management
-- 📱 **Remote Dev**: Code from iPhone/iPad via Codespaces + Tailscale
+- ⚡ **Quick Capture**: Siri → Todoist → AI Auto-tagged → Notion (< 5 seconds)
+- 🤖 **AI Auto-Tagging**: Smart categorization (@work/@personal/@urgent/@code/@research)
+- 🔄 **Bidirectional Sync**: Notion ↔ Todoist via n8n webhooks (real-time, conflict-free)
+- 🧠 **Multi-Agent AI**: OpenAI/Claude nodes for intelligent task processing
+- 🔐 **1Password Integration**: Service Account for secure secret management (no hardcoded tokens)
+- 📱 **ADHD-Optimized**: Backend-only workflow, minimal context-switching, < 5s capture
 
-## Architecture
+## Current Architecture (n8n-Based)
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │           NOTION (Ultimate Source of Truth)          │
 │                                                      │
-│  Knowledge Base | Tasks/Projects | API Logs         │
+│  📋 To Do Database                                   │
+│  • Title, Due Date, Priority, Status                 │
+│  • Auto_Tags (AI-generated)                          │
+│  • Todoist_ID (deduplication)                        │
+│  • Last_Synced (conflict resolution)                 │
 └──────────────────────┬──────────────────────────────┘
-                       │
-                       ▼
+                       ↑
+                       │ (bidirectional sync)
+                       ↓
 ┌─────────────────────────────────────────────────────┐
-│        MCP ORCHESTRATOR (Running on Mac)             │
+│              n8n WORKFLOW (€20/mo Starter)           │
 │                                                      │
-│  Core Services:                                      │
-│  • Notion Sync Engine                                │
-│  • Todoist Bidirectional Sync                        │
-│  • 1Password Service Account Integration             │
-│  • Raycast Bridge                                    │
-│  • GitHub Webhook Receiver                           │
-│  • Agent Task Delegator                              │
+│  Triggers:                                           │
+│  • Todoist Webhook (real-time)                       │
+│  • Notion Database Trigger                           │
+│  • Schedule (every 5 min - catch-all)                │
 │                                                      │
-│  MCP Servers:                                        │
-│  • Notion MCP (read/write)                           │
-│  • Todoist MCP (tasks)                               │
-│  • 1Password MCP (secrets - read only)               │
-│  • Orchestrator MCP (meta-operations)                │
+│  AI Processing:                                      │
+│  • OpenAI/Claude node (auto-tagging)                 │
+│  • Confidence scoring (>70% = auto-apply)            │
+│  • Project suggestion (keyword-based)                │
+│                                                      │
+│  Sync Logic:                                         │
+│  • IF node (direction detection)                     │
+│  • Switch node (conflict resolution)                 │
+│  • Set node (metadata storage)                       │
+│  • Error logging (Sync Errors database)              │
 └───┬──────────────┬──────────────┬─────────────┬─────┘
-    │              │              │             │
-    ▼              ▼              ▼             ▼
-Copilot        Raycast        Todoist      1Password
-(+Agents)                    (+Google Cal)
+    ↓              ↓              ↓             ↓
+  Todoist      Webhooks      Email         Notion
+ (Inbox)      (GitHub)    (Errors)    (Sync Errors)
 ```
+
+**Why n8n?**
+- ✅ €20/mo (vs Motion $49/mo, Zapier $20+ hidden costs)
+- ✅ All AI features included (multi-agent, LangChain, local LLM)
+- ✅ 2,500 executions/month (unlimited steps per execution)
+- ✅ Template exists (3-5 hours setup vs 40+ hours custom)
+- ✅ Self-hostable (open-source, no vendor lock-in)
+
+See [STRATEGIC-VALUE-ANALYSIS.md](docs/STRATEGIC-VALUE-ANALYSIS.md) for full comparison.
 
 ## Quick Start
 
 ### Prerequisites
 
-- macOS (Apple Silicon or Intel)
-- Node.js 20+ (LTS)
-- Docker Desktop
-- 1Password CLI + Service Account
-- Todoist Premium (for Google Calendar sync)
-- Notion API key
-- GitHub Copilot Pro+ (for agents)
+- n8n account (Starter plan: €20/mo, or self-host Community Edition for FREE)
+- Notion account + API integration
+- Todoist account (free tier works)
+- 1Password (optional, for secret management)
 
-### Installation
+### Setup (3-5 hours)
+
+**Option A: Use n8n Cloud (Fastest)**
+
+1. Sign up at [n8n.io](https://n8n.io/pricing/) (7-day free trial)
+2. Click "Build with AI" in workflow editor
+3. Paste combined n8n prompt (see below)
+4. Configure credentials (Notion OAuth, Todoist API)
+5. Test sync
+
+**Option B: Self-Host n8n Community (FREE)**
 
 ```bash
-# Clone repository
-git clone https://github.com/Kingy2709/mcp-orchestrator-one-truth-repository.git
-cd mcp-orchestrator-one-truth-repository
+# Docker
+docker run -it --rm --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n
 
-# Run setup script (installs dependencies, configures 1Password)
-./scripts/setup.sh
-
-# Configure environment (follow prompts for API keys)
-./scripts/configure-1password.sh
-
-# Start orchestrator
-docker-compose up -d
-
-# Verify health
-./scripts/health-check.sh
+# Access at http://localhost:5678
+# Follow same setup as Option A
 ```
 
-See [docs/SETUP.md](docs/SETUP.md) for detailed installation instructions.
+**Combined n8n AI Prompt:** See [docs/n8n-prompt.md](docs/n8n-prompt.md) for the complete prompt (bidirectional sync + AI auto-tagging + conflict resolution + error handling).
+
+**Notion Database Setup:**
+
+1. Create "To Do" database in Notion with properties:
+   - Title (text)
+   - Due Date (date)
+   - Priority (select: High/Medium/Low)
+   - Status (select: To Do/In Progress/Done)
+   - Tags (multi-select)
+   - Auto_Tags (multi-select) - AI-generated
+   - Todoist_ID (text) - for deduplication
+   - Last_Synced (date) - conflict resolution
+
+2. Share database with n8n Notion integration
+
+3. Configure Todoist webhook in n8n (copy webhook URL from n8n node)
+
+See [docs/SETUP.md](docs/SETUP.md) for detailed instructions.
 
 ## Workflow Examples
 
