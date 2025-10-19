@@ -38,7 +38,7 @@
 
 1. Go to [1Password Developer Tools](https://my.1password.com/developer-tools/infrastructure-secrets/service-accounts)
 2. Click **Create Service Account**
-3. Name: `mcp-orchestrator-service-account`
+3. Name: `1password.op-service-account-token.mcp-orchestrator`
 4. Description: "n8n workflow automation + GitHub Copilot MCP + CI/CD"
 5. Click **Create**
 6. **Copy the token immediately** (shows only once): `ops_ey...`
