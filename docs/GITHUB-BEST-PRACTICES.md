@@ -191,18 +191,21 @@ git branch -d feature/add-authentication
 | **Branch** | Parallel timeline | Features, experiments |
 
 **Commit:**
+
 ```bash
 git commit -m "fix: resolve login bug"
 # Creates snapshot with unique hash: 7ae9c5e1...
 ```
 
 **Tag:**
+
 ```bash
 git tag v1.0.0
 # Points to commit, human-readable name
 ```
 
 **Branch:**
+
 ```bash
 git checkout -b feature/new-feature
 # Creates separate timeline for development
@@ -315,9 +318,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ```markdown
 # ADR-XXX: [Short Title]
 
-**Status:** [Proposed | Accepted | Deprecated | Superseded]  
-**Date:** YYYY-MM-DD  
-**Deciders:** [Names]  
+**Status:** [Proposed | Accepted | Deprecated | Superseded]
+**Date:** YYYY-MM-DD
+**Deciders:** [Names]
 **Tags:** #category #topic
 
 ## Context
@@ -355,9 +358,9 @@ What is the change we're proposing/making?
 ```markdown
 # ADR-001: Use TypeScript for Backend
 
-**Status:** Accepted  
-**Date:** 2025-10-12  
-**Deciders:** Engineering team  
+**Status:** Accepted
+**Date:** 2025-10-12
+**Deciders:** Engineering team
 **Tags:** #language #backend
 
 ## Context
@@ -395,6 +398,7 @@ Use TypeScript with strict mode enabled.
 **Format:** `<type>(<scope>): <subject>`
 
 **Types:**
+
 - `feat:` New feature
 - `fix:` Bug fix
 - `docs:` Documentation only
@@ -459,6 +463,7 @@ git push origin main
 ### Team Project (Git Flow)
 
 **Branches:**
+
 - `main` (production)
 - `develop` (integration)
 - `feature/*` (new features)
@@ -490,6 +495,7 @@ git push origin main --tags
 ### GitHub Flow (Recommended for Most Projects)
 
 **Branches:**
+
 - `main` (always deployable)
 - `feature/*` (short-lived)
 

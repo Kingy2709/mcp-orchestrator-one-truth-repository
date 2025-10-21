@@ -29,6 +29,7 @@ graph LR
 ```
 
 **Example**: "Siri, remind me to research OAuth for GitHub integration"
+
 1. Todoist receives command, parses natural language → task created
 2. n8n webhook triggered (< 1 second)
 3. OpenAI node analyzes: "OAuth" + "GitHub" → @work @urgent @research tags
@@ -53,6 +54,7 @@ graph TD
 ```
 
 **Conflict Resolution Logic**:
+
 - **Timestamp-based**: Most recent change wins
 - **Priority override**: Todoist priority 1 (urgent) always syncs to Notion
 - **Deduplication**: SHA-256 hash of content prevents infinite loops
@@ -74,6 +76,7 @@ graph LR
 ```
 
 **AI Prompt Template** (embedded in n8n):
+
 ```
 Analyze this task and suggest tags:
 Task: "{{ $json.content }}"
@@ -117,12 +120,12 @@ Workflow Nodes:
 1. Todoist Webhook Trigger
    - URL: https://n8n.example.com/webhook/todoist
    - Events: item_added, item_updated, item_completed
-   
+
 2. OpenAI/Claude Node (AI Auto-Tagger)
    - Model: gpt-4 or claude-3-sonnet
    - System prompt: Tag extraction rules
    - Output: { tags, confidence, reasoning }
-   
+
 3. Notion Node (Create/Update Database Item)
    - Database: Tasks
    - Properties:
@@ -132,16 +135,16 @@ Workflow Nodes:
      - Todoist_ID: Unique identifier
      - AI_Confidence: 0-1 score
      - Last_Synced: Timestamp
-   
+
 4. Todoist Node (Update Task)
    - Add AI-generated labels
    - Update priority if needed
-   
+
 5. HTTP Request Node (Trigger GitHub Copilot Agent)
    - Condition: @research or @code tag detected
    - Endpoint: GitHub API workflow_dispatch
    - Payload: Task context + agent type
-   
+
 6. Error Handler
    - Log to Notion "Sync Errors" database
    - Retry 3 times with exponential backoff
@@ -154,21 +157,22 @@ Workflow Nodes:
 1. Notion Trigger (Database Item Updated)
    - Database: Tasks
    - Poll interval: 30 seconds (webhook support coming soon)
-   
+
 2. HTTP Request Node (Todoist API)
    - Endpoint: POST /rest/v2/tasks or PATCH /rest/v2/tasks/{id}
    - Conflict detection: Compare Last_Synced timestamp
-   
+
 3. Deduplication Node (Function)
    - Generate SHA-256 hash of content
    - Check against previous hash
    - Skip if identical (prevents infinite loop)
-   
+
 4. Update Notion (Set Last_Synced)
    - Timestamp current sync
 ```
 
 **Key n8n Features Used:**
+
 - **AI Nodes**: OpenAI, Anthropic Claude, LangChain
 - **Webhooks**: Real-time Todoist triggers (< 1s latency)
 - **HTTP Requests**: Notion API, Todoist API, GitHub API
@@ -177,6 +181,7 @@ Workflow Nodes:
 - **Execution**: 2,500/month (Starter plan €20), ~1,500 expected usage
 
 **Why n8n Over Custom Orchestrator?**
+
 - ✅ Visual workflow editor (faster iteration)
 - ✅ Built-in AI nodes (no custom OpenAI integration needed)
 - ✅ Webhook management (no Express server maintenance)
@@ -189,12 +194,13 @@ See [ADR-001](docs/decisions/ADR-001-use-n8n-over-custom.md) for comprehensive d
 ### Archived Custom Orchestrator Code
 
 > **Status**: Archived for reference (not deleted, ~80% complete)
-> 
+>
 > The custom TypeScript orchestrator in `orchestrator/` remains as:
+>
 > - Learning reference for future AI features
 > - Example TypeScript architecture with Zod validation
 > - Demonstration of 1Password Service Account integration
-> 
+>
 > **Not maintained**, **not deployed**, **not part of active system**.
 
 ### MCP Server Layer (GitHub Copilot Integration)
@@ -206,6 +212,7 @@ See [ADR-001](docs/decisions/ADR-001-use-n8n-over-custom.md) for comprehensive d
 1. **Official Notion MCP Server** (replaces custom)
    - Install: `npm install -g @makenotion/notion-mcp-server`
    - Configure in `.copilot/config.json`:
+
      ```json
      {
        "mcpServers": {
@@ -218,6 +225,7 @@ See [ADR-001](docs/decisions/ADR-001-use-n8n-over-custom.md) for comprehensive d
        }
      }
      ```
+
    - Tools: search_pages, create_page, update_page, query_database
 
 2. **GitHub MCP Server** (for Copilot Agent triggers)
@@ -232,11 +240,12 @@ See [ADR-001](docs/decisions/ADR-001-use-n8n-over-custom.md) for comprehensive d
 **Configuration**: See [MCP-SERVER-SETUP.md](docs/MCP-SERVER-SETUP.md) for detailed setup instructions.
 
 **Usage in Copilot Chat:**
+
 ```
 User: "Search Notion for OAuth research tasks"
 Copilot: [Uses Notion MCP] Found 3 pages: OAuth Integration, ...
 
-User: "What's my Todoist API token?"  
+User: "What's my Todoist API token?"
 Copilot: [Uses 1Password MCP] Retrieved from vault: op://...
 ```
 
@@ -269,6 +278,7 @@ graph LR
 ```
 
 **Benefits Over Custom Server:**
+
 - ✅ Built-in signature verification
 - ✅ Automatic retry on failure (3 attempts, exponential backoff)
 - ✅ Error logging to execution history
@@ -301,12 +311,13 @@ n8n Node Configuration:
 **Agent Workflow Files:**
 
 **`.github/workflows/research-agent.yml`**:
+
 ```yaml
 name: Research Agent
 on:
   repository_dispatch:
     types: [copilot_agent_trigger]
-    
+
 jobs:
   research:
     if: github.event.client_payload.agent == 'research-agent'
@@ -332,6 +343,7 @@ jobs:
 - **`agents/code-agent.yml`**: Implementation with PR creation
 
 **Trigger Flow**:
+
 1. n8n detects @research or @code tag in AI auto-tagger output
 2. HTTP Request node calls GitHub repository_dispatch
 3. GitHub Actions workflow triggered
@@ -358,11 +370,13 @@ curl -X POST "https://api.todoist.com/rest/v2/tasks" \
 ```
 
 **Available Scripts:**
+
 - `quick-task.sh` - Siri/Raycast → Todoist
 - `save-to-notion.sh` - Clipboard → Notion page
 - `search-everything.sh` - Unified search (Notion + Todoist + GitHub)
 
 **Installation:**
+
 - Copy to `~/.config/raycast/scripts/`
 - Set executable: `chmod +x *.sh`
 - Configure in Raycast preferences
@@ -386,6 +400,7 @@ Store in memory (never disk)
 ```
 
 **Best Practices:**
+
 - ✅ Use 1Password Service Account (not Environments or `op inject`)
 - ✅ Rotate tokens quarterly
 - ✅ Scope GitHub PAT to minimum permissions
@@ -407,6 +422,7 @@ Tailscale VPN (100.x.x.x)
 ```
 
 **Tailscale Benefits:**
+
 - Private IP (no public exposure)
 - End-to-end encryption
 - Works behind NAT/firewall
@@ -418,7 +434,7 @@ Tailscale VPN (100.x.x.x)
 
 **Option 1: n8n Cloud (Recommended)**
 
-1. **Sign up**: https://n8n.io/trial (14-day free trial)
+1. **Sign up**: <https://n8n.io/trial> (14-day free trial)
 2. **Plan**: Starter €20/mo (2,500 executions, AI nodes included)
 3. **Import workflow**:
    - Use combined prompt from Phase 17 (bidirectional sync + AI auto-tagging)
@@ -454,11 +470,13 @@ volumes:
 ```
 
 **Commands**:
+
 - `docker-compose up -d` - Start n8n
 - `docker-compose logs -f n8n` - View logs
-- Open http://localhost:5678 - Access n8n UI
+- Open <http://localhost:5678> - Access n8n UI
 
 **Self-Hosted Limitations**:
+
 - ❌ No "Build with AI" workflow generator
 - ❌ Manual workflow creation required
 - ✅ Unlimited executions (no 2,500/mo limit)
@@ -486,6 +504,7 @@ npm install -g @makenotion/notion-mcp-server
 ```
 
 **Test in Copilot Chat:**
+
 ```
 User: "Search Notion for OAuth tasks"
 Copilot: [Uses Notion MCP] Found 3 pages...

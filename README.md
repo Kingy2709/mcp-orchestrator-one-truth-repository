@@ -15,6 +15,7 @@ Transform your workflow into a seamless automation connecting Notion, Todoist, a
 **Decision rationale:** See [STRATEGIC-VALUE-ANALYSIS.md](docs/STRATEGIC-VALUE-ANALYSIS.md) for comprehensive comparison (n8n vs Zapier vs Motion).
 
 **Architecture Decision Records:**
+
 - [ADR-001: Use n8n Over Custom Orchestrator](docs/decisions/ADR-001-use-n8n-over-custom.md)
 - [ADR-002: Reject Motion](docs/decisions/ADR-002-reject-motion.md)
 
@@ -73,6 +74,7 @@ This repository documents an **ADHD-optimized workflow** using n8n for automated
 ```
 
 **Why n8n?**
+
 - ✅ €20/mo (vs Motion $49/mo, Zapier $20+ hidden costs)
 - ✅ All AI features included (multi-agent, LangChain, local LLM)
 - ✅ 2,500 executions/month (unlimited steps per execution)
@@ -296,7 +298,7 @@ MIT © 2025 Kingy2709
 
 ## Acknowledgments
 
-- **Model Context Protocol**: https://modelcontextprotocol.io
-- **1Password SDKs**: https://developer.1password.com
-- **Notion API**: https://developers.notion.com
-- **Todoist API**: https://developer.todoist.com
+- **Model Context Protocol**: <https://modelcontextprotocol.io>
+- **1Password SDKs**: <https://developer.1password.com>
+- **Notion API**: <https://developers.notion.com>
+- **Todoist API**: <https://developer.todoist.com>

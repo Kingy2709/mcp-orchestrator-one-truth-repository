@@ -19,11 +19,13 @@ This guide provides best-practice architecture for your Notion workspace, applyi
 Every workspace needs an "Operations Hub" - your README.md equivalent:
 
 **Purpose:**
+
 - First page users see
 - Navigation to all other areas
 - Workspace "table of contents"
 
 **Structure:**
+
 ```
 📊 Notion Operations Hub
 ├── 👋 Welcome (README)
@@ -37,6 +39,7 @@ Every workspace needs an "Operations Hub" - your README.md equivalent:
 Don't create 14 separate pages for related topics. Group them!
 
 **Before (Fragmented):**
+
 ```
 ├── 1Password Setup
 ├── 1Password Best Practices
@@ -48,6 +51,7 @@ Don't create 14 separate pages for related topics. Group them!
 ```
 
 **After (Organized):**
+
 ```
 ├── 📁 Integrations
 │   ├── 1Password (merged 3 pages)
@@ -58,6 +62,7 @@ Don't create 14 separate pages for related topics. Group them!
 ### 3. **Single Source of Truth**
 
 Each piece of information lives in ONE place:
+
 - Link to it (don't duplicate)
 - Update in one place (propagates everywhere)
 - Use relations (not copy-paste)
@@ -81,6 +86,7 @@ Each piece of information lives in ONE place:
 ```
 
 **Database Properties:**
+
 - `Type` (select): README, Documentation, Decision, Changelog, Project, Archive
 - `Topic` (multi-select): 1Password, MCP, Notion, Todoist, n8n, GitHub
 - `Status` (select): Draft, In Progress, Complete, Archived
@@ -89,6 +95,7 @@ Each piece of information lives in ONE place:
 - `Related To` (relation): Links to related pages
 
 **Views:**
+
 1. **All Pages** (table) - See everything
 2. **By Type** (board) - Group by Type
 3. **By Topic** (board) - Group by Topic
@@ -168,6 +175,7 @@ Each piece of information lives in ONE place:
 ```
 
 **Benefits:**
+
 - **Hubs** = High-level navigation (like folders)
 - **Databases** = Searchable, filterable, relatable
 - **Relations** = Connect across hubs without duplication
@@ -344,9 +352,11 @@ Connect data across databases (single source of truth):
 **Example: Link Tasks to Projects**
 
 **To Do Database:**
+
 - Add property: `Related Project` (Relation to Projects database)
 
 **Projects Database:**
+
 - Add property: `Tasks` (Relation to To Do database)
 
 **Benefit:** Update project status → see all related tasks automatically
@@ -358,6 +368,7 @@ Connect data across databases (single source of truth):
 **Example: Count tasks per project**
 
 **Projects Database:**
+
 - Add property: `Task Count` (Rollup from Tasks relation, Count All)
 - Add property: `Overdue Tasks` (Rollup, Count where Due Date < Today)
 
@@ -458,7 +469,7 @@ Recent decisions:
 3. **Add Properties to Decision Log:**
 
    Current properties: ?
-   
+
    Recommended:
    - Status (Proposed / Accepted / Deprecated)
    - Date
@@ -469,6 +480,7 @@ Recent decisions:
 4. **Create Sync Errors Database:**
 
    For n8n error tracking:
+
    ```
    📊 Sync Errors (database)
    ├── Timestamp
@@ -508,7 +520,7 @@ Template:
 **Status:** Proposed
 **Date:** Today
 **Deciders:** Me
-**Tags:** 
+**Tags:**
 
 ## Context
 [Why?]
@@ -524,6 +536,7 @@ Template:
 ### **2. Use Relations Liberally**
 
 Connect everything:
+
 - Tasks → Projects
 - Decisions → Documentation
 - Projects → Repositories
@@ -532,6 +545,7 @@ Connect everything:
 ### **3. Use Synced Blocks**
 
 Single source of truth:
+
 - Create block once
 - Sync to multiple locations
 - Update once → propagates everywhere
@@ -539,6 +553,7 @@ Single source of truth:
 ### **4. Use Views Strategically**
 
 One database, multiple views:
+
 - Table (all data)
 - Board (kanban by status)
 - Calendar (timeline)
@@ -607,18 +622,21 @@ Formula: if(prop("Due Date") < now() and prop("Status") != "Done", "🔴 OVERDUE
 ## Maintenance Routine
 
 ### **Weekly:**
+
 - Review Decision Log (any new ADRs needed?)
 - Update CHANGELOG (what changed this week?)
 - Archive completed projects
 - Check Sync Errors database
 
 ### **Monthly:**
+
 - Audit Documentation database (outdated pages?)
 - Consolidate fragmented content
 - Review relations (any broken links?)
 - Clean up tags (standardize naming)
 
 ### **Quarterly:**
+
 - Major CHANGELOG entry (Q1 2025 summary)
 - Archive old decisions (mark as "Superseded")
 - Restructure if needed (workspace evolved?)
