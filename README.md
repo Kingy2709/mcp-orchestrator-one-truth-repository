@@ -19,11 +19,79 @@ Transform your workflow into a seamless automation connecting Notion, Todoist, a
 - [ADR-001: Use n8n Over Custom Orchestrator](docs/decisions/ADR-001-use-n8n-over-custom.md)
 - [ADR-002: Reject Motion](docs/decisions/ADR-002-reject-motion.md)
 
+## 🎯 Game-Changing Discoveries (October 2025)
+
+### Raycast as a Natural Orchestrator
+
+**Raycast now offers native orchestration capabilities** that significantly simplify the workflow automation landscape:
+
+1. **GitHub Copilot Extension (OAuth)**: Raycast's GitHub Copilot extension uses OAuth authentication and allows you to:
+   - View existing GitHub Copilot Agent tasks within repositories
+   - Create new Copilot Agent tasks directly from Raycast
+   - Access all Copilot features without leaving your quick-launcher interface
+
+2. **Notion & Todoist Extensions (OAuth)**: Raycast also includes native extensions for both Notion and Todoist using OAuth, making it:
+   - A fully-fledged orchestrator out-of-the-box
+   - Zero custom development required for basic task capture and management
+   - Seamless integration with existing workflows
+
+**Implication**: For many users, **Raycast alone** may provide sufficient orchestration capabilities without requiring n8n or custom development, especially for quick capture and task management workflows.
+
+### GitHub Copilot CLI's Full MCP Integration
+
+Previous assumptions about GitHub Copilot CLI's limitations have been **debunked**. GitHub Copilot CLI now offers:
+
+#### Native MCP Server Support
+
+GitHub Copilot CLI comes with the **GitHub MCP server pre-configured** and supports adding custom MCP servers:
+
+**Adding MCP Servers:**
+```bash
+# Use the slash command in Copilot CLI
+/mcp add
+# Fill in the server details using Tab to navigate fields
+# Press Ctrl+S to save
+```
+
+**Configuration Storage:**
+- MCP servers are stored in `mcp-config.json`
+- Default location: `~/.config/` (customizable via `XDG_CONFIG_HOME`)
+- JSON structure follows the standard MCP protocol specification
+
+**Usage Monitoring:**
+```bash
+# View context and usage statistics
+/usage
+# Shows:
+# - Premium requests used in session
+# - Session duration
+# - Lines of code edited
+# - Token usage breakdown per model
+# - Warnings when context approaches token limits
+```
+
+**Key Capabilities:**
+
+1. **Pre-configured GitHub MCP Server**: Interact with GitHub resources directly from CLI (merge PRs, view issues, etc.)
+2. **Extensible via Custom MCP Servers**: Add any MCP server (Notion, Todoist, 1Password, etc.) to extend functionality
+3. **Tool Auto-Approval**: Configure tools to run without manual approval for seamless automation
+4. **Full Feature Parity**: All GitHub Copilot features available in CLI, including Coding Agent with MCP support
+
+**Documentation References:**
+
+- [Use Copilot CLI](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-copilot-cli)
+- [Allowing Tools Without Manual Approval](https://docs.github.com/en/copilot/concepts/agents/about-copilot-cli#allowing-tools-to-be-used-without-manual-approval)
+- [MCP and Coding Agent](https://docs.github.com/en/copilot/concepts/agents/coding-agent/mcp-and-coding-agent)
+
+**Implication**: GitHub Copilot CLI can serve as a **command-line orchestrator** with full MCP protocol support, eliminating the need for custom server implementations in many scenarios. Combined with Raycast's GUI extensions, this creates a powerful two-tier orchestration system (CLI + GUI).
+
 ---
 
 ## Overview
 
 This repository documents an **ADHD-optimized workflow** using n8n for automated bidirectional sync between Notion and Todoist. Capture thoughts via Siri, auto-tag with AI, sync to Notion, and maintain a canonical source of truth—all in < 5 seconds.
+
+**Recent Discovery**: Raycast's native GitHub Copilot, Notion, and Todoist extensions (all using OAuth) combined with GitHub Copilot CLI's full MCP server support may provide sufficient orchestration capabilities for many users without requiring n8n or custom development. See the "Game-Changing Discoveries" section above for details.
 
 ### Key Features
 
@@ -87,14 +155,60 @@ See [STRATEGIC-VALUE-ANALYSIS.md](docs/STRATEGIC-VALUE-ANALYSIS.md) for full com
 
 ### Prerequisites
 
+**Option 1: Raycast + GitHub Copilot CLI (Simplest)**
+
+- Raycast app installed
+- GitHub Copilot subscription
+- Raycast extensions: GitHub Copilot, Notion, Todoist (all use OAuth)
+- GitHub Copilot CLI (`gh copilot` command)
+
+**Option 2: n8n Workflow Automation (Advanced)**
+
 - n8n account (Starter plan: €20/mo, or self-host Community Edition for FREE)
 - Notion account + API integration
 - Todoist account (free tier works)
 - 1Password (optional, for secret management)
 
-### Setup (3-5 hours)
+### Setup
 
-**Option A: Use n8n Cloud (Fastest)**
+**Option 1: Raycast + Copilot CLI (< 30 minutes)**
+
+1. Install Raycast extensions:
+   - GitHub Copilot extension (OAuth)
+   - Notion extension (OAuth)
+   - Todoist extension (OAuth)
+
+2. Install GitHub CLI and Copilot extension:
+   ```bash
+   # Install GitHub CLI
+   brew install gh
+   
+   # Install Copilot CLI extension
+   gh extension install github/gh-copilot
+   
+   # Authenticate
+   gh auth login
+   ```
+
+3. Add MCP servers to Copilot CLI:
+   ```bash
+   # Launch Copilot CLI
+   gh copilot
+   
+   # Add Notion MCP server
+   /mcp add
+   # Configure: makenotion/notion-mcp-server
+   
+   # Add Todoist MCP server (if available)
+   /mcp add
+   ```
+
+4. Start using:
+   - Quick capture via Raycast → Todoist
+   - Manage tasks via Raycast → Notion
+   - Automate via GitHub Copilot CLI with MCP servers
+
+**Option 2: n8n Cloud (3-5 hours)**
 
 1. Sign up at [n8n.io](https://n8n.io/pricing/) (7-day free trial)
 2. Click "Build with AI" in workflow editor
@@ -102,7 +216,7 @@ See [STRATEGIC-VALUE-ANALYSIS.md](docs/STRATEGIC-VALUE-ANALYSIS.md) for full com
 4. Configure credentials (Notion OAuth, Todoist API)
 5. Test sync
 
-**Option B: Self-Host n8n Community (FREE)**
+**Option 3: Self-Host n8n Community (FREE)**
 
 ```bash
 # Docker
