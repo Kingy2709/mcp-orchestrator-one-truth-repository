@@ -39,7 +39,7 @@ Transform your workflow into a seamless automation connecting Notion, Todoist, a
 
 ### GitHub Copilot CLI's Full MCP Integration
 
-Previous assumptions about GitHub Copilot CLI's limitations have been **debunked**. GitHub Copilot CLI now offers:
+Previous assumptions about GitHub Copilot CLI's limitations have been **corrected through further research**. GitHub Copilot CLI now offers:
 
 #### Native MCP Server Support
 
@@ -199,7 +199,7 @@ See [STRATEGIC-VALUE-ANALYSIS.md](docs/STRATEGIC-VALUE-ANALYSIS.md) for full com
    /mcp add
    # Configure: makenotion/notion-mcp-server
    
-   # Add Todoist MCP server (if available)
+   # Add other MCP servers as needed
    /mcp add
    ```
 
